@@ -11,35 +11,18 @@ homepath=/dev/sda3
 flashdisk=/dev/sdb
 
 
-# boot partition
-function create_boot {
-    yes | mkfs.ext4 $bootpath &&
-    mkdir -p /mnt/boot &&
-    mount -o uid=0,gid=0,fmask=0077,dmask=0077 $bootpath /mnt  
-}
-
-
-function create_recovery {
-    mount $flashdisk /opt &&
-    mkdir /mnt {efi,loader,kernel} &&
-    mkdir /mnt/efi {linux,boot,recovery,systemd} &&
-    bootctl --path=/mnt install &&
-    cp /opt/arch/boot/x86_64/* /mnt/efi/recovery &&
-    cp -r /opt/arch/x86_64 /mnt/efi/recovery &&
-    cat << EOF >> /mnt/loader/entries/recovery.conf
-    title      recovery
-    versions   archiso
-    linux      /efi/recovery/vmlinuz-linux
-    initrd     /efi/recovery/initramfs-linux.img
-    options    archisobasedir=efi/recovery archisolabel=BOOT copytoram
-    EOF
-}
-
-
 # root partition
 function create_proc {
     yes | mkfs.ext4 $procpath &&
     mount $procpath /mnt
+}
+
+
+# boot partition
+function create_boot {
+    yes | mkfs.ext4 $bootpath &&
+    mkdir -p /mnt/boot &&
+    mount $bootpath /mnt/boot
 }
 
 
@@ -100,7 +83,7 @@ function user {
 
 # grub
 function grub_install {
-    arch-chroot /mnt grub-install --target=i386-pc /boot --bootloader-id=Arch &&
+    arch-chroot /mnt grub-install --target=i386-pc /dev/sda1 &&
 }
 
 
@@ -115,16 +98,6 @@ function cmdline {
 # mkinitcpio
 function mkinitcpio {
     mkinitcpio -P
-}
-
-
-# mbr
-function mbr-lts {
-    echo "#linux lts preset" > /mnt/etc/mkinitcpio.d/linux-lts.preset &&
-    echo 'ALL_config="/etc/mkinitcpio.d/default.conf"' >> /mnt/etc/mkinitcpio.d/linux-lts.preset &&
-    echo 'ALL_kver="/boot/kernel/vmlinuz-linux-lts"' >> /mnt/etc/mkinitcpio.d/linux-lts.preset &&
-    echo "PRESETS=('default')" >> /mnt/etc/mkinitcpio.d/linux-lts.preset &&
-    echo 'default_uki="/boot/efi/EFI/linux/arch-linux-lts.efi"' >> /mnt/etc/mkinitcpio.d/linux-lts.preset
 }
 
 
@@ -147,21 +120,16 @@ function gen_grub {
 
 
 function runscript {
-    
-    echo "configure boot"
-    create_boot
-    clear &&
-    sleep 5
 
 
-    echo "configure boot"
-    create_recovery
-    clear &&
-    sleep 5
-
-    
     echo "configure root"
     create_proc
+    clear &&
+    sleep 5
+
+  
+    echo "configure boot"
+    create_boot
     clear &&
     sleep 5
 
@@ -226,12 +194,6 @@ function runscript {
     sleep 10
 
 
-    echo "configure mbr"
-    mbr-lts
-    clear &&
-    sleep 10
-
-
     echo "configure entries"
     entries
     clear &&
@@ -246,7 +208,6 @@ function runscript {
 
 
 runscript
-
 
 
 
