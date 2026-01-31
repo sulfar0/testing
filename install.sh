@@ -97,6 +97,7 @@ function cmdline {
 
 # mkinitcpio
 function mkinitcpio {
+    touch /etc/vconsole.conf &&
     mkinitcpio -P
 }
 
