@@ -1,7 +1,7 @@
 #!/bin/bash
 
 hostname=shelver
-username=testing-alpha
+username=test
 password=topos
 timezone=Asia/Jakarta
 drivpath=/dev/sda
@@ -36,7 +36,7 @@ function create_home {
 
 # package
 function packages {
-    pacstrap /mnt base base-devel neovim linux-lts linux-firmware amd-ucode grub iwd --noconfirm &&
+    pacstrap /mnt base base-devel neovim linux-lts linux linux-zen linux-firmware amd-ucode grub iwd mkinitcpio  --noconfirm &&
     genfstab -U /mnt >> /mnt/etc/fstab
 }
 
@@ -59,10 +59,6 @@ function hostname {
 function gentime {
     arch-chroot /mnt ln -sf /usr/share/zoneinfo/$timezone /mnt/etc/localtime &&
     arch-chroot /mnt hwclock --systohc &&
-    arch-chroot /mnt timedatectl set-ntp true &&
-    arch-chroot /mnt timedatectl set-timezone $timezone &&
-    arch-chroot /mnt timedatectl status &&
-    arch-chroot /mnt timedatectl show-timesync --all
 }
 
 
@@ -83,7 +79,8 @@ function user {
 
 # grub
 function grub_install {
-    arch-chroot /mnt grub-install --target=i386-pc $bootpath
+    arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=Arch &&
+    arch-chroot /mnt echo "GRUB_DISABLE_SUBMENU=y" >> /mnt/etc/default/grub
 }
 
 
