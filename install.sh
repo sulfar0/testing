@@ -64,7 +64,7 @@ function hostname {
 # time
 function gentime {
     arch-chroot /mnt ln -sf /usr/share/zoneinfo/$timezone /mnt/etc/localtime &&
-    arch-chroot /mnt hwclock --systohc &&
+    arch-chroot /mnt hwclock --systohc
 }
 
 
