@@ -90,6 +90,30 @@ function grub_install {
 }
 
 
+function setup_linux_zen {
+    echo "#linux zen preset" > /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo 'ALL_config="/etc/mkinitcpio.conf"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo 'ALL_kver="/boot/kernel/vmlinuz-linux-zen"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo "PRESETS=('default')" >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo 'default_image="/boot/initramfs-linux-zen.img"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset
+}
+
+function setup_linux {
+    echo "#linux preset" > /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo 'ALL_config="/etc/mkinitcpio.conf"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo 'ALL_kver="/boot/kernel/vmlinuz-linux"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo "PRESETS=('default')" >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo 'default_image="/boot/initramfs-linux.img"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset
+}
+
+function setup_linux_lts {
+    echo "#linux preset" > /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo 'ALL_config="/etc/mkinitcpio.conf"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo 'ALL_kver="/boot/kernel/vmlinuz-linux-lts"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo "PRESETS=('default')" >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo 'default_image="/boot/initramfs-linux-lts.img"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset
+}
+
 # mkinitcpio
 function mkinitcpio {
     mkdir /mnt/boot/kernel &&
@@ -99,11 +123,9 @@ function mkinitcpio {
     touch /mnt/etc/cmdline.d/{01-boot.conf,05-misc.conf} &&
     echo "root=$procpath" > /mnt/etc/cmdline.d/01-boot.conf &&
     echo "rw" > /mnt/etc/cmdline.d/05-misc.conf &&
-    echo "#linux zen preset" > /mnt/etc/mkinitcpio.d/linux-zen.preset &&
-    echo 'ALL_config="/etc/mkinitcpio.conf"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
-    echo 'ALL_kver="/boot/kernel/vmlinuz-linux-zen"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
-    echo "PRESETS=('default')" >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
-    echo 'default_image="/boot/initramfs-linux-zen.img"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    setup_linux_zen &&
+    setup_linux &&
+    setup_linux_lts &&
     echo 'MODULES=()' > /mnt/etc/mkinitcpio.conf &&
     echo 'BINARIES=()' >> /mnt/etc/mkinitcpio.conf &&
     echo 'FILES=()' >> /mnt/etc/mkinitcpio.conf &&
