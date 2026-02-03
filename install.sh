@@ -19,7 +19,7 @@ function create_proc {
 
 # boot partition
 function create_boot {
-    yes | mkfs.ext4 $bootpath &&
+    yes | mkfs.vfat -F32 $bootpath &&
     mkdir -p /mnt/boot &&
     mount $bootpath /mnt/boot
 }
