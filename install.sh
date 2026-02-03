@@ -83,7 +83,7 @@ function user {
 
 # grub
 function grub_install {
-    arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Arch 
+    arch-chroot /mnt grub-install --target=i386-pc $drivpath
 }
 
 
@@ -97,8 +97,8 @@ function cmdline {
 
 # mkinitcpio
 function mkinitcpio {
-    touch /etc/vconsole.conf &&
-    mkinitcpio -P
+    arch-chroot /mnt touch /etc/vconsole.conf &&
+    arch-chroot /mnt mkinitcpio -P
 }
 
 
