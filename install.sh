@@ -92,6 +92,10 @@ function grub_install {
 
 # mkinitcpio
 function mkinitcpio {
+    mkdir /mnt/etc/cmdline.d && 
+    touch /mnt/etc/cmdline.d/{01-boot.conf,05-misc.conf} &&
+    echo "root=$procpath" > /mnt/etc/cmdline.d/01-boot.conf &&
+    echo "rw quiet" > /mnt/etc/cmdline.d/05-misc.conf &&
     echo "#linux zen preset" > /mnt/etc/mkinitcpio.d/linux-zen.preset &&
     echo '#ALL_config="/etc/mkinitcpio.d/default.conf"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
     echo 'ALL_kver="/boot/kernel/vmlinuz-linux-zen"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
