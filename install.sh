@@ -92,6 +92,9 @@ function grub_install {
 
 # mkinitcpio
 function mkinitcpio {
+    mkdir /mnt/boot/kernel &&
+    mv /mnt/boot/vmlinuz* /mnt/boot/kernel &&
+    mv /mnt/boot/amd-ucode /mnt/boot/kernel &&
     mkdir /mnt/etc/cmdline.d && 
     touch /mnt/etc/cmdline.d/{01-boot.conf,05-misc.conf} &&
     echo "root=$procpath" > /mnt/etc/cmdline.d/01-boot.conf &&
@@ -147,6 +150,12 @@ function runscript {
   
     echo "configure boot"
     create_boot
+    clear &&
+    sleep 5
+
+
+    echo "configure swap"
+    create_swap
     clear &&
     sleep 5
 
