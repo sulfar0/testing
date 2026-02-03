@@ -42,7 +42,7 @@ function create_home {
 
 # package
 function packages {
-    pacstrap /mnt base base-devel neovim linux-lts linux linux-zen linux-firmware intel-ucode grub iwd mkinitcpio  --noconfirm &&
+    pacstrap /mnt base base-devel neovim linux-lts linux linux-zen linux-firmware amd-ucode grub iwd mkinitcpio  --noconfirm &&
     genfstab -U /mnt >> /mnt/etc/fstab
 }
 
@@ -138,17 +138,17 @@ function entries {
 cat << EOF >> /mnt/etc/grub.d/40_custom
 menuentry "Arch-zen" {
     linux /kernel/vmlinuz-linux-zen root=$procpath rw
-    initrd /kernel/intel-ucode.img
+    initrd /kernel/amd-ucode.img
     initrd /initramfs-linux-zen.img 
 }
 menuentry "Arch-linux" {
     linux /kernel/vmlinuz-linux root=$procpath rw
-    initrd /kernel/intel-ucode.img
+    initrd /kernel/amd-ucode.img
     initrd /initramfs-linux.img 
 }
 menuentry "Arch-lts" {
     linux /kernel/vmlinuz-linux-lts root=$procpath rw
-    initrd /kernel/intel-ucode.img
+    initrd /kernel/amd-ucode.img
     initrd /initramfs-linux-lts.img 
 }
 EOF
