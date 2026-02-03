@@ -7,9 +7,8 @@ timezone=Asia/Jakarta
 drivpath=/dev/sda
 bootpath=/dev/sda1
 procpath=/dev/sda2
-homepath=/dev/sda3
-flashdisk=/dev/sdb
-
+swappath=/dev/sda3
+homepath=/dev/sda4
 
 # root partition
 function create_proc {
@@ -23,6 +22,13 @@ function create_boot {
     yes | mkfs.ext4 $bootpath &&
     mkdir -p /mnt/boot &&
     mount $bootpath /mnt/boot
+}
+
+
+# swap partition
+function create_swap {
+    mkswap $swappath &&
+    swapon $swappath
 }
 
 
@@ -80,13 +86,43 @@ function user {
 # grub
 function grub_install {
     arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=Arch &&
-    arch-chroot /mnt echo "GRUB_DISABLE_SUBMENU=y" >> /mnt/etc/default/grub
+    echo "GRUB_DISABLE_SUBMENU=y" >> /mnt/etc/default/grub
 }
 
 
 # mkinitcpio
 function mkinitcpio {
+    echo "#linux zen preset" > /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo '#ALL_config="/etc/mkinitcpio.d/default.conf"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo 'ALL_kver="/boot/kernel/vmlinuz-linux-zen"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo "PRESETS=('default')" >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo '#default_uki="/boot/efi/EFI/linux/arch-linux-zen.efi"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo 'MODULES=()' > /mnt/etc/mkinitcpio.conf &&
+    echo 'BINARIES=()' >> /mnt/etc/mkinitcpio.conf &&
+    echo 'FILES=()' >> /mnt/etc/mkinitcpio.conf &&
+    echo 'HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)' >> /mnt/etc/mkinitcpio.conf &&
     arch-chroot /mnt mkinitcpio -P
+}
+
+# entries with initramfs
+function entries {
+cat << EOF >> /mnt/etc/grub.d/40_custom
+menuentry "Arch-zen" {
+    linux /kernel/vmlinuz-linux-zen root=$procpath rw
+    initrd /kernel/amd-ucode.img
+    initrd /initramfs-linux-zen.img 
+}
+menuentry "Arch-linux" {
+    linux /kernel/vmlinuz-linux root=$procpath rw
+    initrd /kernel/amd-ucode.img
+    initrd /initramfs-linux.img 
+}
+menuentry "Arch-lts" {
+    linux /kernel/vmlinuz-linux-lts root=$procpath rw
+    initrd /kernel/amd-ucode.img
+    initrd /initramfs-linux-lts.img 
+}
+EOF
 }
 
 
@@ -161,6 +197,12 @@ function runscript {
 
     echo "configure mkinitcpio"
     mkinitcpio
+    clear &&
+    sleep 10
+
+
+    echo "configure entries"
+    entries
     clear &&
     sleep 10
 
