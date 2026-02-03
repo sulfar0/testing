@@ -87,30 +87,9 @@ function grub_install {
 }
 
 
-#cmdline
-function cmdline {
-    mkdir -p /mnt/etc/cmdline.d &&
-    touch /mnt/etc/cmdline.d/{01-boot.conf,02-mods.conf,03-secs.conf,04-perf.conf,05-misc.conf} &&
-    echo "root=UUID=$(blkid -s UUID -o value $procpath)" > /mnt/etc/cmdline.d/01-boot.conf
-}
-
-
 # mkinitcpio
 function mkinitcpio {
-    arch-chroot /mnt touch /etc/vconsole.conf &&
     arch-chroot /mnt mkinitcpio -P
-}
-
-
-# entries with initramfs
-function entries {
-cat << EOF >> /mnt/etc/grub.d/40_custom
-menuentry "Shelver OS" {
-    linux /kernel/vmlinuz-linux-lts root=$procpath rw
-    initrd /kernel/amd-ucode.img
-    initrd /initramfs-linux-lts.img 
-}
-EOF
 }
 
 
@@ -181,22 +160,10 @@ function runscript {
     grub_install
     clear &&
     sleep 10
-
-
-    echo "configure cmdline"
-    cmdline
-    clear &&
-    sleep 10
-
+    
 
     echo "configure mkinitcpio"
     mkinitcpio
-    clear &&
-    sleep 10
-
-
-    echo "configure entries"
-    entries
     clear &&
     sleep 10
 
