@@ -42,7 +42,7 @@ function create_home {
 
 # package
 function packages {
-    pacstrap /mnt base base-devel neovim linux-lts linux linux-zen linux-firmware amd-ucode grub iwd mkinitcpio  --noconfirm &&
+    pacstrap /mnt base base-devel neovim linux-lts linux linux-zen linux-firmware intel-ucode grub iwd mkinitcpio  --noconfirm &&
     genfstab -U /mnt >> /mnt/etc/fstab
 }
 
@@ -94,16 +94,16 @@ function grub_install {
 function mkinitcpio {
     mkdir /mnt/boot/kernel &&
     mv /mnt/boot/vmlinuz* /mnt/boot/kernel &&
-    mv /mnt/boot/amd-ucode /mnt/boot/kernel &&
+    mv /mnt/boot/intel-ucode /mnt/boot/kernel &&
     mkdir /mnt/etc/cmdline.d && 
     touch /mnt/etc/cmdline.d/{01-boot.conf,05-misc.conf} &&
     echo "root=$procpath" > /mnt/etc/cmdline.d/01-boot.conf &&
-    echo "rw quiet" > /mnt/etc/cmdline.d/05-misc.conf &&
+    echo "rw" > /mnt/etc/cmdline.d/05-misc.conf &&
     echo "#linux zen preset" > /mnt/etc/mkinitcpio.d/linux-zen.preset &&
-    echo '#ALL_config="/etc/mkinitcpio.d/default.conf"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo 'ALL_config="/etc/mkinitcpio.conf"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
     echo 'ALL_kver="/boot/kernel/vmlinuz-linux-zen"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
     echo "PRESETS=('default')" >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
-    echo '#default_uki="/boot/efi/EFI/linux/arch-linux-zen.efi"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
+    echo 'default_image="/boot/initramfs-linux-zen.img"' >> /mnt/etc/mkinitcpio.d/linux-zen.preset &&
     echo 'MODULES=()' > /mnt/etc/mkinitcpio.conf &&
     echo 'BINARIES=()' >> /mnt/etc/mkinitcpio.conf &&
     echo 'FILES=()' >> /mnt/etc/mkinitcpio.conf &&
@@ -116,17 +116,17 @@ function entries {
 cat << EOF >> /mnt/etc/grub.d/40_custom
 menuentry "Arch-zen" {
     linux /kernel/vmlinuz-linux-zen root=$procpath rw
-    initrd /kernel/amd-ucode.img
+    initrd /kernel/intel-ucode.img
     initrd /initramfs-linux-zen.img 
 }
 menuentry "Arch-linux" {
     linux /kernel/vmlinuz-linux root=$procpath rw
-    initrd /kernel/amd-ucode.img
+    initrd /kernel/intel-ucode.img
     initrd /initramfs-linux.img 
 }
 menuentry "Arch-lts" {
     linux /kernel/vmlinuz-linux-lts root=$procpath rw
-    initrd /kernel/amd-ucode.img
+    initrd /kernel/intel-ucode.img
     initrd /initramfs-linux-lts.img 
 }
 EOF
