@@ -83,7 +83,7 @@ function user {
 
 # grub
 function grub_install {
-    arch-chroot /mnt grub-install --target=i386-pc $drivpath
+    arch-chroot /mnt grub-install --target=i386-pc $bootpath
 }
 
 
